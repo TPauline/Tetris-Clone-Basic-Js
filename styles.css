@@ -1,0 +1,40 @@
+*{
+    margin:0px;
+    padding:0px;
+    box-sizing: border-box;
+}
+
+body{
+    overflow: hidden;
+    background: rgba(239, 137, 4, 0.8);
+}
+
+#gameArea{
+    /* color: pink; */
+    background: rgba(2, 21, 95, 0.8);
+    height: 80px;
+    width: 80px;
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap;
+    border-style: solid;
+    border-radius: 0.3em;
+    border-width: 0.3em;
+}
+
+.squares{
+    background:rgba(70, 78, 107, 0.8);
+    margin: 0;
+    /* border-radius: 5px; */
+    /* border-color: rgba(1, 50, 87, 0.3); */
+    /* border-top-width: 3px; */
+    border-radius: 15%;
+    margin-left: 1px;
+    margin-top: 1px;
+}
+.tetrimino{
+    border-style: solid;
+    border-style: groove;
+    background:  rgba(221, 4, 221, 0.8);
+    border-color: rgba(126, 4, 126, 0.8);
+}
