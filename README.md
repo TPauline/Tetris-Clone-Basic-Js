@@ -1,3 +1,3 @@
 # Tetris-Clone-Basic-Js
-#unfinished
+# !! Incomplete !!
 ## Link: https://tpauline.github.io/Tetris-Clone-Basic-Js/
