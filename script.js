@@ -14,62 +14,268 @@ console.log("_____|", mobile, tablet, os)
 body = document.body;
 squaresMetrix = []
 currentTetrimino = null;
-const TETRIMINOS = [
-    {
+const TETRIMINOS = [{
         name: "i_block",
-        looks: { 0: [[0, 0], [1, 0], [2, 0], [3, 0]], 1: [[0, 0], [0, 1], [0, 2], [0, 3]] },
+        looks: {
+            0: [
+                [0, 0],
+                [1, 0],
+                [2, 0],
+                [3, 0]
+            ],
+            1: [
+                [0, 0],
+                [0, 1],
+                [0, 2],
+                [0, 3]
+            ]
+        },
         color: "rgba(0, 255, 255,1)"
     },
     {
         name: "o_block",
-        looks: { 0: [[0, 0], [0, 1], [1, 0], [1, 1]] },
+        looks: {
+            0: [
+                [0, 0],
+                [0, 1],
+                [1, 0],
+                [1, 1]
+            ]
+        },
         color: "rgba(255, 255, 0,1)"
     }, {
         name: "t_block",
         looks: {
-            0: [[0, 1], [1, 0], [1, 1], [1, 2]],
-            1: [[0, 0], [1, 0], [2, 0], [1, 1]],
-            2: [[0, 0], [0, 1], [0, 2], [1, 1]],
-            3: [[0, 1], [1, 1], [2, 1], [1, 0]]
+            0: [
+                [0, 1],
+                [1, 0],
+                [1, 1],
+                [1, 2]
+            ],
+            1: [
+                [0, 0],
+                [1, 0],
+                [2, 0],
+                [1, 1]
+            ],
+            2: [
+                [0, 0],
+                [0, 1],
+                [0, 2],
+                [1, 1]
+            ],
+            3: [
+                [0, 1],
+                [1, 1],
+                [2, 1],
+                [1, 0]
+            ]
         },
         color: "rgba(128, 0, 128,1)"
     },
     {
         name: "j_block",
         looks: {
-            0: [[0, 1], [1, 1], [2, 1], [2, 0]],
-            1: [[0, 0], [1, 0], [1, 1], [1, 2]],
-            2: [[0, 0], [1, 0], [2, 0], [0, 1]],
-            3: [[0, 0], [0, 1], [0, 2], [1, 2]]
+            0: [
+                [0, 1],
+                [1, 1],
+                [2, 1],
+                [2, 0]
+            ],
+            1: [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [1, 2]
+            ],
+            2: [
+                [0, 0],
+                [1, 0],
+                [2, 0],
+                [0, 1]
+            ],
+            3: [
+                [0, 0],
+                [0, 1],
+                [0, 2],
+                [1, 2]
+            ]
         },
         color: "rgba(0, 0, 255,1)"
     }, {
         name: "l_block",
         looks: {
-            0: [[0, 0], [1, 0], [2, 0], [2, 1]],
-            1: [[0, 0], [0, 1], [0, 2], [1, 0]],
-            2: [[0, 0], [0, 1], [1, 1], [2, 1]],
-            3: [[1, 0], [1, 1], [1, 2], [0, 2]]
+            0: [
+                [0, 0],
+                [1, 0],
+                [2, 0],
+                [2, 1]
+            ],
+            1: [
+                [0, 0],
+                [0, 1],
+                [0, 2],
+                [1, 0]
+            ],
+            2: [
+                [0, 0],
+                [0, 1],
+                [1, 1],
+                [2, 1]
+            ],
+            3: [
+                [1, 0],
+                [1, 1],
+                [1, 2],
+                [0, 2]
+            ]
         },
         color: "rgba(255, 127, 0,1)"
     }, {
         name: "s_block",
         looks: {
-            0: [[0, 1], [0, 2], [1, 0], [1, 1]],
-            1: [[0, 0], [1, 0], [1, 1], [2, 1]],
+            0: [
+                [0, 1],
+                [0, 2],
+                [1, 0],
+                [1, 1]
+            ],
+            1: [
+                [0, 0],
+                [1, 0],
+                [1, 1],
+                [2, 1]
+            ],
         },
         color: "rgba(0, 255, 0,1)"
     },
     {
         name: "z_block",
         looks: {
-            0: [[0, 0], [0, 1], [1, 1], [1, 2]],
-            1: [[1, 0], [2, 0], [0, 1], [1, 1]],
+            0: [
+                [0, 0],
+                [0, 1],
+                [1, 1],
+                [1, 2]
+            ],
+            1: [
+                [1, 0],
+                [2, 0],
+                [0, 1],
+                [1, 1]
+            ],
         },
         color: "rgba(255, 0, 0,1)"
     }
 ];
 
+//classes
+class Tetrimino {
+    constructor(object) {
+        this.name = object.name;
+        this.looks = object.looks;
+        this.color = object.color;
+        this.currentLook = 0;
+        this.currentCol = 0;
+        this.currentRow = 0;
+        this.currentBlocks = new Set()
+        this.isSet = false;
+    }
+
+    canMove(offsetR, offsetC) {
+        console.log("here***8", this.looks)
+        var count = 0;
+
+        for (let i = 0; i < this.looks[this.currentLook].length; i++) {
+            r = this.looks[this.currentLook][i][0]
+            c = this.looks[this.currentLook][i][1]
+            r += offsetR
+            c += offsetC
+            console.log(r, c)
+            if ((r < 0) || (r > 19) || (c < 0) || (c > 9)) {
+                console.log("cant move")
+                return false;
+            }
+        }
+        return true;
+    }
+
+    resetSquare() {
+
+        this.looks[this.currentLook].forEach(pair => {
+            r = pair[0]
+            c = pair[1]
+            let square = squaresMetrix[r][c];
+            console.log(square)
+            square.classList.remove(...square.classList);
+            square.classList.add("squares");
+            square.style.background = resetSquareOg.style.background
+        });
+    }
+
+    move(offsetR, offsetC) {
+        for (let i = 0; i < this.looks[this.currentLook].length; i++) {
+            this.looks[this.currentLook][i][0] += offsetR
+            this.looks[this.currentLook][i][1] += offsetC
+            r = this.looks[this.currentLook][i][0]
+            c = this.looks[this.currentLook][i][1]
+            let square = squaresMetrix[r][c];
+            square.classList.add("tetrimino");
+        }
+    }
+    
+    rotate(){
+        var len = this.looks[this.currentLook].length
+        this.currentLook+=1;
+        this.currentLook %= len;
+        for (let i = 0; i < this.looks[this.currentLook].length; i++) {
+            let  r = this.looks[this.currentLook][i][0] += this.currentRow
+            let c = this.looks[this.currentLook][i][1] += this.currentCol
+            squaresMetrix[r + x][c + y].classList.add("tetrimino")
+        }
+
+        // this.looks[this.currentLook].forEach(pair => {
+        //     // pair[1]+=this.currentCol
+        //     r = pair[0]
+        //     c = pair[1]
+        //     squaresMetrix[r + x][c + y].classList.add("tetrimino")
+        // });
+
+        
+
+    }
+
+    moveLeft() {
+        if (this.canMove(0, -1)) {
+            this.resetSquare()
+            this.move(0, -1)
+            this.currentCol-=1
+        } else {
+            console.log("outofbound l")
+        }
+    }
+
+    moveRight() {
+        if (this.canMove(0, 1)) {
+            this.resetSquare()
+            this.move(0, 1)
+            this.currentCol+=1
+        } else {
+            console.log("outofbound r")
+        }
+    }
+
+    moveDown() {
+        if (this.canMove(1, 0)) {
+            this.resetSquare()
+            this.move(1, 0)
+            this.currentCol+=1
+
+        } else {
+            console.log("outofbound r")
+        }
+    }
+}
 
 
 function setup() {
@@ -123,6 +329,7 @@ function resizeSquares() {
         });
     });
 }
+
 setup();
 createSquares();
 const resetSquareOg = document.createElement("resetSquareOg")
@@ -131,97 +338,12 @@ resetSquareOg.style.width = `${squareW - 2}px`;
 resetSquareOg.classList.add("squares")
 console.log(squaresMetrix);
 
-window.addEventListener("resize", () => {
-    setup();
-    resizeSquares();
-})
-
-
-class Tetrimino {
-    constructor(object) {
-        this.name = object.name;
-        this.looks = object.looks;
-        this.color = object.color;
-        this.currentLook = 0;
-        this.row = 0;
-        this.col = 0;
-        this.currentBlocks = new Set()
-        this.isSet = false;
-    }
-    isInbound(offsetR, offsetC) {
-        console.log("here")
-        for (let i = 0; i < this.looks[this.currentLook].length; i++) {
-
-            r = this.looks[this.currentLook][i][0]
-            c = this.looks[this.currentLook][i][1]
-            if ((r + offsetR) <= -1 || (r + offsetR) >= 20 || (c + offsetC) <= -1 || (c + offsetC) >= 10) {
-                console.log("NOO")
-                return false;
-
-            }
-            console.log("goood to go")
-            return true;
-        }
-    }
-    resetSquare() {
-        console.log("this.looks", "")
-        console.log("this.currentLook", "")
-        this.looks[this.currentLook].forEach(pair => {
-            r = pair[0]
-            c = pair[1]
-            console.log(r, c)
-            let square = squaresMetrix[r][c];
-            console.log(square)
-
-            square.classList.remove(...square.classList);
-            // square.setAttribute('style',"")
-
-            square.classList.add("squares");
-            square.style.background = resetSquareOg.style.background
-        });
-    }
-
-    move(offsetR, offsetC) {
-        for (let i = 0; i < this.looks[this.currentLook].length; i++) {
-            console.log("......", this.looks[this.currentLook][i])
-            this.looks[this.currentLook][i][0] += offsetR
-            this.looks[this.currentLook][i][1] += offsetC
-            console.log("..^^^....", this.looks[this.currentLook][i])
-            r = this.looks[this.currentLook][i][0]
-            c = this.looks[this.currentLook][i][1]
-            let square = squaresMetrix[r][c];
-            // square.classList.add("tetrimino");
-            square.style.background = currentTetrimino.color;
-        }
-    }
-
-    moveLeft() {
-        if (this.isInbound(0, -1)) {
-            this.resetSquare()
-            this.move(0, -1)
-        } else {
-            console.log("outofbound l")
-        }
-    }
-    moveRight() {
-        if (this.isInbound(0, 1)) {
-            this.resetSquare()
-            this.move(0, 1)
-        } else {
-            console.log("outofbound r")
-        }
-    }
-    pushDown() {
-
-    }
-}
 
 function visualizerRotations(tetri, x, y, i) {
     let ran = Math.floor(Math.random() * 4 + 1)
     console.log("random#", ran)
     console.log(tetri[0].length)
     console.log(tetri[ran % 4])
-
     tetri[i % Object.keys(tetri).length].forEach(pair => {
         r = pair[0]
         c = pair[1]
@@ -232,20 +354,23 @@ function visualizerRotations(tetri, x, y, i) {
 
 function clearSquares() {
     document.querySelectorAll(".squares").forEach(t => {
-        // t.classList.remove("tetrimino")
         t.classList.remove(...t.classList);
         t.classList.add("squares")
     });
 }
+
 var tetObj = TETRIMINOS[Math.floor(Math.random() * TETRIMINOS.length)];
 currentTetrimino = new Tetrimino(tetObj);
-console.log(currentTetrimino.looks)
 looks = currentTetrimino.looks;
 console.log(looks)
-currentTetrimino.col = 4
+currentTetrimino.currentCol = 4
 for (let i = 0; i < currentTetrimino.looks[0].length; i++) {
-    currentTetrimino.looks[0][i][1] += currentTetrimino.col;
+    currentTetrimino.looks[0][i][1] += currentTetrimino.currentCol ;
+    let r = currentTetrimino.looks[0][i][0]
+    let c = currentTetrimino.looks[0][i][1]
+    console.log(`start here: (${r},${c})`)
 }
+
 looks[0].forEach(pair => {
     r = pair[0]
     c = pair[1]
@@ -255,58 +380,34 @@ looks[0].forEach(pair => {
 
 
 
-// let i = 0;
-// setInterval(() => {
-//     clearSquares()
-//     i++
-// }, 1000);
 
+//timmers
+setInterval(()=>{currentTetrimino.moveDown()}, 1000);
 
-// setInterval(() => {
-//     visualizerRotations(TETRIMINOS[4].looks, 0, 0, i);
-// }, 1000);
+// event listeners 
 
-// setInterval(() => {
-//     visualizerRotations(TETRIMINOS[3].looks, 0, 7, i);
-// }, 1000);
-
-// setInterval(() => {
-//     visualizerRotations(TETRIMINOS[0].looks, 5, 0, i);
-// }, 1000);
-
-// setInterval(() => {
-//     visualizerRotations(TETRIMINOS[2].looks, 5, 7, i);
-// }, 1000);
-
-// setInterval(() => {
-//     visualizerRotations(TETRIMINOS[5].looks, 13, 0, i);
-// }, 1000);
-
-// setInterval(() => {
-//     visualizerRotations(TETRIMINOS[6].looks, 13, 7, i);
-// }, 1000);
-
-// setInterval(() => {
-//     visualizerRotations(TETRIMINOS[1].looks, 18, 4, i);
-// }, 1000);
+window.addEventListener("resize", () => {
+    setup();
+    resizeSquares();
+})
 
 document.addEventListener("keyup", (event) => {
     event.preventDefault()
     switch (event.key) {
         case "ArrowLeft":
             // Left pressed
-            
+
             currentTetrimino.moveLeft()
             break;
         case "ArrowRight":
             // Right pressed
             currentTetrimino.moveRight()
             break;
-        case "ArrowUp":
-            // Up pressed
-            break;
-        case "ArrowDown":
-            // Down pressed
+
+        case " ":
+            // Right presse
+            console.log("SPACE KEY UP")
+            currentTetrimino.rotate()
             break;
     }
 });
