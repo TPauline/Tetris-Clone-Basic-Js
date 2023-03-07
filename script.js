@@ -234,7 +234,7 @@ class Tetrimino {
                 c = this.looks[this.currentLook][i][1]
                 let square = squaresMetrix[r][c];
                 square.classList.add("tetrimino");
-
+                square.style.backgroundColor = this.color
                 if(r == 19 || (r<19 && squaresMetrix[r+1][c].classList.contains("isSet")))
                  this.isSet = true
             }
