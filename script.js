@@ -16,155 +16,155 @@ squaresMetrix = []
 currentTetrimino = null;
 const TETRIMINOS = [{
         name: "i_block",
-        looks: {
-            0: [
+        looks: [
+             [
                 [0, 0],
                 [1, 0],
                 [2, 0],
                 [3, 0]
             ],
-            1: [
+                [
                 [0, 0],
                 [0, 1],
                 [0, 2],
                 [0, 3]
             ]
-        },
+        ],
         color: "rgba(0, 255, 255,1)"
     },
     {
         name: "o_block",
-        looks: {
-            0: [
+        looks: [
+             [
                 [0, 0],
                 [0, 1],
                 [1, 0],
                 [1, 1]
             ]
-        },
+        ],
         color: "rgba(255, 255, 0,1)"
     }, {
         name: "t_block",
-        looks: {
-            0: [
+        looks: [
+             [
                 [0, 1],
                 [1, 0],
                 [1, 1],
                 [1, 2]
             ],
-            1: [
+             [
                 [0, 0],
                 [1, 0],
                 [2, 0],
                 [1, 1]
             ],
-            2: [
+             [
                 [0, 0],
                 [0, 1],
                 [0, 2],
                 [1, 1]
             ],
-            3: [
+             [
                 [0, 1],
                 [1, 1],
                 [2, 1],
                 [1, 0]
             ]
-        },
+        ],
         color: "rgba(128, 0, 128,1)"
     },
     {
         name: "j_block",
-        looks: {
-            0: [
+        looks: [
+             [
                 [0, 1],
                 [1, 1],
                 [2, 1],
                 [2, 0]
             ],
-            1: [
+             [
                 [0, 0],
                 [1, 0],
                 [1, 1],
                 [1, 2]
             ],
-            2: [
+             [
                 [0, 0],
                 [1, 0],
                 [2, 0],
                 [0, 1]
             ],
-            3: [
+             [
                 [0, 0],
                 [0, 1],
                 [0, 2],
                 [1, 2]
             ]
-        },
+        ],
         color: "rgba(0, 0, 255,1)"
     }, {
         name: "l_block",
-        looks: {
-            0: [
+        looks: [
+             [
                 [0, 0],
                 [1, 0],
                 [2, 0],
                 [2, 1]
             ],
-            1: [
+             [
                 [0, 0],
                 [0, 1],
                 [0, 2],
                 [1, 0]
             ],
-            2: [
+             [
                 [0, 0],
                 [0, 1],
                 [1, 1],
                 [2, 1]
             ],
-            3: [
+             [
                 [1, 0],
                 [1, 1],
                 [1, 2],
                 [0, 2]
             ]
-        },
+        ],
         color: "rgba(255, 127, 0,1)"
     }, {
         name: "s_block",
-        looks: {
-            0: [
+        looks: [
+             [
                 [0, 1],
                 [0, 2],
                 [1, 0],
                 [1, 1]
             ],
-            1: [
+             [
                 [0, 0],
                 [1, 0],
                 [1, 1],
                 [2, 1]
             ],
-        },
+        ],
         color: "rgba(0, 255, 0,1)"
     },
     {
         name: "z_block",
-        looks: {
-            0: [
+        looks: [
+            [
                 [0, 0],
                 [0, 1],
                 [1, 1],
                 [1, 2]
             ],
-            1: [
+             [
                 [1, 0],
                 [2, 0],
                 [0, 1],
                 [1, 1]
             ],
-        },
+        ],
         color: "rgba(255, 0, 0,1)"
     }
 ];
@@ -172,8 +172,9 @@ const TETRIMINOS = [{
 //classes
 class Tetrimino {
     constructor(object) {
+        this.ogLooks = { ...object.looks};
         this.name = object.name;
-        this.looks = object.looks;
+        this.looks = { ...object.looks};
         this.color = object.color;
         this.currentLook = 0;
         this.currentCol = 0;
@@ -183,7 +184,9 @@ class Tetrimino {
     }
 
     canMove(offsetR, offsetC) {
-        console.log("here***8", this.looks)
+        console.log("^^^^^^", this.looks, this.currentLook)
+        console.log("^^!!!^^^^", this.currentLook)
+
         var count = 0;
 
         for (let i = 0; i < this.looks[this.currentLook].length; i++) {
@@ -192,10 +195,18 @@ class Tetrimino {
             r += offsetR
             c += offsetC
             console.log(r, c)
+
+            // if(squaresMetrix[r][c].classList.contains("tetrimino") && isArrayInArray(myArray, [r,c]]) ){
+
+            // }
             if ((r < 0) || (r > 19) || (c < 0) || (c > 9)) {
+
                 console.log("cant move")
                 return false;
             }
+
+            if(squaresMetrix[r][c].classList.contains("isSet") || squaresMetrix[r][c].classList.contains("isSet"))
+                return false
         }
         return true;
     }
@@ -215,34 +226,79 @@ class Tetrimino {
 
     move(offsetR, offsetC) {
         for (let i = 0; i < this.looks[this.currentLook].length; i++) {
-            this.looks[this.currentLook][i][0] += offsetR
-            this.looks[this.currentLook][i][1] += offsetC
-            r = this.looks[this.currentLook][i][0]
-            c = this.looks[this.currentLook][i][1]
-            let square = squaresMetrix[r][c];
-            square.classList.add("tetrimino");
+            if(!squaresMetrix[r][c].classList.contains("isSet")){
+
+                this.looks[this.currentLook][i][0] += offsetR
+                this.looks[this.currentLook][i][1] += offsetC
+                r = this.looks[this.currentLook][i][0]
+                c = this.looks[this.currentLook][i][1]
+                let square = squaresMetrix[r][c];
+                square.classList.add("tetrimino");
+
+                if(r == 19 || (r<19 && squaresMetrix[r+1][c].classList.contains("isSet")))
+                 this.isSet = true
+            }
+
+        }
+
+        if(this.isSet){
+            for (let i = 0; i < this.looks[this.currentLook].length; i++) {
+                    r = this.looks[this.currentLook][i][0]
+                    c = this.looks[this.currentLook][i][1]
+                    let square = squaresMetrix[r][c];
+                    square.classList.add("isSet");
+                
+    
+            }
         }
     }
     
-    rotate(){
+
+    canRotate(){
+        // var len = this.looks[this.currentLook].length
+        //  let currLook = this.currentLook + 1;
+        //  currLook %= len;
         var len = this.looks[this.currentLook].length
-        this.currentLook+=1;
-        this.currentLook %= len;
-        for (let i = 0; i < this.looks[this.currentLook].length; i++) {
-            let  r = this.looks[this.currentLook][i][0] += this.currentRow
-            let c = this.looks[this.currentLook][i][1] += this.currentCol
-            squaresMetrix[r + x][c + y].classList.add("tetrimino")
-        }
+        console.log(`${this.name }!!!!!!!${this.currentLook}`)
+         let currLook = this.currentLook + 1;
+         if (currLook > this.looks.length)
+            currLook = 0
+        if (currLook <len){
+            for (let i = 0; i < this.looks[currLook].length; i++) {
+                let  r = this.looks[currLook][i][0] + this.currentRow
+                let c = this.looks[currLook][i][1] + this.currentCol
+                if ((r < 0) || (r > 19) || (c < 0) || (c > 9)) {
+                    console.log(`cant rorate ${r},${c} `)
+                    return false;
+                }
+            } 
+        }  else
+            return false
 
-        // this.looks[this.currentLook].forEach(pair => {
-        //     // pair[1]+=this.currentCol
-        //     r = pair[0]
-        //     c = pair[1]
-        //     squaresMetrix[r + x][c + y].classList.add("tetrimino")
-        // });
+        return true
+    }
 
+    rotate(){
+        let oldLook =this.currentLook
+        this.resetSquare()
+        let len = this.looks[this.currentLook].length
         
+        // this.currentLook %= len;
+        if (this.currentLook > this.looks.length)
+            this.currentLook  = 0
+        if (this.currentLook+1 <len){
+            this.currentLook+=1;
+            for (let i = 0; i < this.looks[this.currentLook].length; i++) {
+                this.looks[this.currentLook][i][0] += this.currentRow
+                this.looks[this.currentLook][i][1] += this.currentCol
+                let  r = this.looks[this.currentLook][i][0] 
+                let c = this.looks[this.currentLook][i][1]
+                squaresMetrix[r ][c ].classList.add("tetrimino")
+            }   
 
+            this.looks[oldLook] = { ...this.ogLooks[oldLook]} 
+        } else
+            return false
     }
 
     moveLeft() {
@@ -269,14 +325,24 @@ class Tetrimino {
         if (this.canMove(1, 0)) {
             this.resetSquare()
             this.move(1, 0)
-            this.currentCol+=1
+            this.currentRow+=1
 
         } else {
+            this.isSet =true
             console.log("outofbound r")
         }
     }
 }
 
+
+function isArrayInArray(arr, item){
+    var item_as_string = JSON.stringify(item);
+  
+    var contains = arr.some(function(ele){
+      return JSON.stringify(ele) === item_as_string;
+    });
+    return contains;
+  }
 
 function setup() {
     if (uaData.mobile || !(mobile == 0) || tablet) {
@@ -359,30 +425,44 @@ function clearSquares() {
     });
 }
 
-var tetObj = TETRIMINOS[Math.floor(Math.random() * TETRIMINOS.length)];
-currentTetrimino = new Tetrimino(tetObj);
-looks = currentTetrimino.looks;
-console.log(looks)
-currentTetrimino.currentCol = 4
-for (let i = 0; i < currentTetrimino.looks[0].length; i++) {
-    currentTetrimino.looks[0][i][1] += currentTetrimino.currentCol ;
-    let r = currentTetrimino.looks[0][i][0]
-    let c = currentTetrimino.looks[0][i][1]
-    console.log(`start here: (${r},${c})`)
+
+function blitTet(){
+    var tetObj = TETRIMINOS[Math.floor(Math.random() * TETRIMINOS.length)];
+    currentTetrimino = new Tetrimino(tetObj);
+    looks = currentTetrimino.looks;
+    console.log(looks)
+    currentTetrimino.currentCol = 4
+    currentTetrimino.currentRow = 0    
+    for (let i = 0; i < currentTetrimino.looks[0].length; i++) {
+        currentTetrimino.looks[0][i][1] += currentTetrimino.currentCol ;
+        let r = currentTetrimino.looks[0][i][0]
+        let c = currentTetrimino.looks[0][i][1]
+        console.log(`start here: (${r},${c})`)
+    }
+
+    looks[0].forEach(pair => {
+        r = pair[0]
+        c = pair[1]
+        squaresMetrix[r][c].classList.add("tetrimino")
+        squaresMetrix[r][c].style.background = currentTetrimino.color
+    });
 }
 
-looks[0].forEach(pair => {
-    r = pair[0]
-    c = pair[1]
-    squaresMetrix[r][c].classList.add("tetrimino")
-    squaresMetrix[r][c].style.background = currentTetrimino.color
-});
+blitTet()
+
 
 
 
 
 //timmers
 setInterval(()=>{currentTetrimino.moveDown()}, 1000);
+
+setInterval(()=>{
+    if (currentTetrimino.isSet){
+        blitTet()
+    }
+}, 1000);
+
 
 // event listeners 
 
@@ -407,7 +487,8 @@ document.addEventListener("keyup", (event) => {
         case " ":
             // Right presse
             console.log("SPACE KEY UP")
-            currentTetrimino.rotate()
+            if(currentTetrimino.canRotate())
+                currentTetrimino.rotate()
             break;
     }
 });
