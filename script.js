@@ -1,5 +1,7 @@
 const wrapper = document.getElementById('wrapper');
 const gameArea = document.getElementById('gameArea');
+var xDown = null;                                                        
+var yDown = null;
 uaData = navigator.userAgentData;
 var
     ua = navigator.userAgent,
@@ -76,31 +78,19 @@ const TETRIMINOS = [{
     {
         name: "j_block",
         looks: [
-             [
-                [0, 1],
-                [1, 1],
-                [2, 1],
-                [2, 0]
-            ],
-             [
-                [0, 0],
-                [1, 0],
-                [1, 1],
-                [1, 2]
-            ],
-             [
-                [0, 0],
-                [1, 0],
-                [2, 0],
-                [0, 1]
-            ],
-             [
-                [0, 0],
-                [0, 1],
-                [0, 2],
-                [1, 2]
-            ]
-        ],
+                    [
+                        [0, 1], [1, 1], [2, 1], [2, 0]
+                    ],
+                    [
+                        [0, 0],  [1, 0], [1, 1], [1, 2]
+                    ],
+                    [
+                        [0, 0],  [1, 0],  [2, 0],  [0, 1]
+                    ],
+                    [
+                        [0, 0], [0, 1],  [0, 2], [1, 2]
+                    ]
+                ],
         color: "rgba(0, 0, 255,1)"
     }, {
         name: "l_block",
@@ -172,33 +162,29 @@ const TETRIMINOS = [{
 //classes
 class Tetrimino {
     constructor(object) {
-        this.ogLooks = { ...object.looks};
         this.name = object.name;
-        this.looks = { ...object.looks};
+        // this.looks = JSON.parse(JSON.stringify(object.looks));
+        this.looks = object.looks;
         this.color = object.color;
         this.currentLook = 0;
         this.currentCol = 0;
-        this.currentRow = 0;
+        this.currentRow = -1;
         this.currentBlocks = new Set()
         this.isSet = false;
+        // console.log("**",JSON.stringify(object.looks[0]))
+        this.fills = [];
     }
 
-    canMove(offsetR, offsetC) {
-        console.log("^^^^^^", this.looks, this.currentLook)
-        console.log("^^!!!^^^^", this.currentLook)
 
-        var count = 0;
+    canMove(offsetR,offsetC) {
 
         for (let i = 0; i < this.looks[this.currentLook].length; i++) {
-            r = this.looks[this.currentLook][i][0]
-            c = this.looks[this.currentLook][i][1]
-            r += offsetR
-            c += offsetC
+            let r = this.looks[this.currentLook][i][0]
+            let c = this.looks[this.currentLook][i][1]
+            r += this.currentRow + offsetR;
+            c +=  this.currentCol + offsetC;
             console.log(r, c)
 
-            // if(squaresMetrix[r][c].classList.contains("tetrimino") && isArrayInArray(myArray, [r,c]]) ){
-
-            // }
             if ((r < 0) || (r > 19) || (c < 0) || (c > 9)) {
 
                 console.log("cant move")
@@ -212,10 +198,11 @@ class Tetrimino {
     }
 
     resetSquare() {
-
-        this.looks[this.currentLook].forEach(pair => {
-            r = pair[0]
-            c = pair[1]
+        console.log("rest ->",this.fills)
+         this.fills.forEach(pair => {
+           let r =  pair[0]
+            let c = pair[1]
+            console.log(pair,r,c)
             let square = squaresMetrix[r][c];
             console.log(square)
             square.classList.remove(...square.classList);
@@ -223,126 +210,97 @@ class Tetrimino {
             square.style.background = resetSquareOg.style.background
         });
     }
-
-    move(offsetR, offsetC) {
+  
+    move() {
+        let isSet = false
         for (let i = 0; i < this.looks[this.currentLook].length; i++) {
-            if(!squaresMetrix[r][c].classList.contains("isSet")){
 
-                this.looks[this.currentLook][i][0] += offsetR
-                this.looks[this.currentLook][i][1] += offsetC
-                r = this.looks[this.currentLook][i][0]
-                c = this.looks[this.currentLook][i][1]
+                let r = this.looks[this.currentLook][i][0] + this.currentRow;
+                let c = this.looks[this.currentLook][i][1] + this.currentCol;
+                this.fills.push([r,c])
+                console.log("fills",this.fills)
+                if(!squaresMetrix[r][c].classList.contains("isSet")){
+
                 let square = squaresMetrix[r][c];
                 square.classList.add("tetrimino");
                 square.style.backgroundColor = this.color
                 if(r == 19 || (r<19 && squaresMetrix[r+1][c].classList.contains("isSet")))
-                 this.isSet = true
+                 isSet = true
             }
 
         }
-
-        if(this.isSet){
+        if(isSet){
             for (let i = 0; i < this.looks[this.currentLook].length; i++) {
-                    r = this.looks[this.currentLook][i][0]
-                    c = this.looks[this.currentLook][i][1]
+                let r = this.looks[this.currentLook][i][0] + this.currentRow;
+                let c = this.looks[this.currentLook][i][1] + this.currentCol;
                     let square = squaresMetrix[r][c];
                     square.classList.add("isSet");
                 
     
             }
+            this.isSet= true
         }
     }
     
 
     canRotate(){
-        // var len = this.looks[this.currentLook].length
-        //  let currLook = this.currentLook + 1;
-        //  currLook %= len;
-        var len = this.looks[this.currentLook].length
-        console.log(`${this.name }!!!!!!!${this.currentLook}`)
-         let currLook = this.currentLook + 1;
-         if (currLook > this.looks.length)
-            currLook = 0
-        if (currLook <len){
-            for (let i = 0; i < this.looks[currLook].length; i++) {
-                let  r = this.looks[currLook][i][0] + this.currentRow
-                let c = this.looks[currLook][i][1] + this.currentCol
-                if ((r < 0) || (r > 19) || (c < 0) || (c > 9)) {
-                    console.log(`cant rorate ${r},${c} `)
-                    return false;
-                }
-            } 
-        }  else
-            return false
+         let nextLook = (this.currentLook+1 < this.looks.length)?this.currentLook+1:0;
+        for (let i = 0; i < this.looks[nextLook].length; i++) {
+            let  r = this.looks[nextLook][i][0] + this.currentRow
+            let c = this.looks[nextLook][i][1] + this.currentCol
+            if ((r < 0) || (r > 19) || (c < 0) || (c > 9)) {
+                console.log(`cant rorate ${r},${c} `)
+                return false;
+            }
+        } 
 
         return true
     }
 
-    rotate(){
-        let oldLook =this.currentLook
-        this.resetSquare()
-        let len = this.looks[this.currentLook].length
-        
-        // this.currentLook %= len;
-        if (this.currentLook > this.looks.length)
-            this.currentLook  = 0
-        if (this.currentLook+1 <len){
-            this.currentLook+=1;
-            for (let i = 0; i < this.looks[this.currentLook].length; i++) {
-                this.looks[this.currentLook][i][0] += this.currentRow
-                this.looks[this.currentLook][i][1] += this.currentCol
-                let  r = this.looks[this.currentLook][i][0] 
-                let c = this.looks[this.currentLook][i][1]
-                squaresMetrix[r ][c ].classList.add("tetrimino")
-            }   
 
-            this.looks[oldLook] = { ...this.ogLooks[oldLook]} 
-        } else
-            return false
+
+    rotate(){
+        this.looks.unshift(this.looks.pop());
     }
 
     moveLeft() {
-        if (this.canMove(0, -1)) {
+        if (this.canMove(0,-1)) {
             this.resetSquare()
-            this.move(0, -1)
+
             this.currentCol-=1
+
+            this.move()
         } else {
             console.log("outofbound l")
         }
     }
 
     moveRight() {
-        if (this.canMove(0, 1)) {
+        if (this.canMove(0,1)) {
             this.resetSquare()
-            this.move(0, 1)
             this.currentCol+=1
+            
+            this.move()
         } else {
             console.log("outofbound r")
         }
     }
 
     moveDown() {
-        if (this.canMove(1, 0)) {
+        if (this.canMove(1,0)) {
             this.resetSquare()
-            this.move(1, 0)
             this.currentRow+=1
+            
+            this.move()
 
         } else {
             this.isSet =true
             console.log("outofbound r")
         }
     }
+    
+   
 }
-
-
-function isArrayInArray(arr, item){
-    var item_as_string = JSON.stringify(item);
-  
-    var contains = arr.some(function(ele){
-      return JSON.stringify(ele) === item_as_string;
-    });
-    return contains;
-  }
 
 function setup() {
     if (uaData.mobile || !(mobile == 0) || tablet) {
@@ -426,29 +384,17 @@ function clearSquares() {
 }
 
 
-function blitTet(){
+function newTetrimino(){
     var tetObj = TETRIMINOS[Math.floor(Math.random() * TETRIMINOS.length)];
     currentTetrimino = new Tetrimino(tetObj);
+    console.log("currentTetrimino  ->", currentTetrimino)
     looks = currentTetrimino.looks;
-    console.log(looks)
+    console.log("currentTetrimino.looks  ->", currentTetrimino.looks)
     currentTetrimino.currentCol = 4
-    currentTetrimino.currentRow = 0    
-    for (let i = 0; i < currentTetrimino.looks[0].length; i++) {
-        currentTetrimino.looks[0][i][1] += currentTetrimino.currentCol ;
-        let r = currentTetrimino.looks[0][i][0]
-        let c = currentTetrimino.looks[0][i][1]
-        console.log(`start here: (${r},${c})`)
-    }
-
-    looks[0].forEach(pair => {
-        r = pair[0]
-        c = pair[1]
-        squaresMetrix[r][c].classList.add("tetrimino")
-        squaresMetrix[r][c].style.background = currentTetrimino.color
-    });
+    // currentTetrimino.move(); 
 }
 
-blitTet()
+newTetrimino()
 
 
 
@@ -459,9 +405,79 @@ setInterval(()=>{currentTetrimino.moveDown()}, 1000);
 
 setInterval(()=>{
     if (currentTetrimino.isSet){
-        blitTet()
+        newTetrimino()
     }
-}, 1000);
+}, 600);
+
+function getTouches(event) {
+    return event.touches ||             // browser API
+           event.originalEvent.touches; // jQuery
+  }                                                     
+                                                                           
+function handleTouchStart(event) {
+    const firstTouch = getTouches(event)[0];                                      
+    xDown = firstTouch.clientX;                                      
+    yDown = firstTouch.clientY;                                      
+}; 
+
+function keyUp_touchSwipe(type, event){
+    var eventKey
+    var xUp, yUp;
+    var xDiff, yDiff ;
+
+    if (type == "touchmove"){
+        if ( xDown ||  yDown ) {
+             xUp = event.touches[0].clientX;                                    
+             yUp = event.touches[0].clientY;
+             xDiff = xDown - xUp;
+             yDiff = yDown - yUp;
+
+             if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
+                if ( xDiff <= 0 ) {
+                    eventKey = "ArrowRight" /* right swipe */ 
+                } else {
+                    eventKey = "ArrowLeft" /* left swipe */
+                }                       
+            } else {
+                if ( yDiff  <=0 ) {
+                  eventKey = "ArrowDown"  /* down swipe */ 
+                }                                                                 
+            }
+            /* reset values */
+            xDown = null;
+            yDown = null;  
+        }
+    }else{
+        eventKey = event.key;
+    }
+    switch (eventKey) {
+        case "ArrowLeft":
+            // Left pressed
+
+            currentTetrimino.moveLeft()
+            break;
+        case "ArrowRight":
+            // Right pressed
+            currentTetrimino.moveRight()
+            break;
+        
+        case "ArrowDown":
+            // Down pressed
+            while(!currentTetrimino.isSet){
+                currentTetrimino.moveDown()
+            }
+
+            break;
+
+        case " ":
+            // Right presse
+            console.log("SPACE KEY UP")
+            if(currentTetrimino.canRotate())
+                currentTetrimino.resetSquare()
+                currentTetrimino.rotate()
+            break;
+    }
+}
 
 
 // event listeners 
@@ -473,22 +489,9 @@ window.addEventListener("resize", () => {
 
 document.addEventListener("keyup", (event) => {
     event.preventDefault()
-    switch (event.key) {
-        case "ArrowLeft":
-            // Left pressed
-
-            currentTetrimino.moveLeft()
-            break;
-        case "ArrowRight":
-            // Right pressed
-            currentTetrimino.moveRight()
-            break;
-
-        case " ":
-            // Right presse
-            console.log("SPACE KEY UP")
-            if(currentTetrimino.canRotate())
-                currentTetrimino.rotate()
-            break;
-    }
+    keyUp_touchSwipe("keyup",event)
 });
+
+document.addEventListener('touchstart', handleTouchStart, false);        
+document.addEventListener('touchmove',(event)=>{
+     keyUp_touchSwipe("touchmove",event)}, false);
