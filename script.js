@@ -1,8 +1,10 @@
+window.addEventListener("load", () => {
+
 const wrapper = document.getElementById('wrapper');
 const gameArea = document.getElementById('gameArea');
 var xDown = null;                                                        
 var yDown = null;
-uaData = navigator.userAgentData;
+var uaData = navigator.userAgentData;
 var
     ua = navigator.userAgent,
     browser = /Edge\/\d+/.test(ua) ? 'ed' : /MSIE 9/.test(ua) ? 'ie9' : /MSIE 10/.test(ua) ? 'ie10' : /MSIE 11/.test(ua) ? 'ie11' : /MSIE\s\d/.test(ua) ? 'ie?' : /rv\:11/.test(ua) ? 'ie11' : /Firefox\W\d/.test(ua) ? 'ff' : /Chrome\W\d/.test(ua) ? 'gc' : /Chromium\W\d/.test(ua) ? 'oc' : /\bSafari\W\d/.test(ua) ? 'sa' : /\bOpera\W\d/.test(ua) ? 'op' : /\bOPR\W\d/i.test(ua) ? 'op' : typeof MSPointerEvent !== 'undefined' ? 'ie?' : '',
@@ -15,7 +17,9 @@ console.log(navigator.userAgentData)
 console.log("_____|", mobile, tablet, os)
 body = document.body;
 squaresMetrix = []
-currentTetrimino = null;
+var found = false;
+var rowFound = 0;
+var currentTetrimino = null;
 const TETRIMINOS = [{
         name: "i_block",
         looks: [
@@ -183,11 +187,11 @@ class Tetrimino {
             let c = this.looks[this.currentLook][i][1]
             r += this.currentRow + offsetR;
             c +=  this.currentCol + offsetC;
-            console.log(r, c)
+            // console.log(r, c)
 
             if ((r < 0) || (r > 19) || (c < 0) || (c > 9)) {
 
-                console.log("cant move")
+                // console.log("cant move")
                 return false;
             }
 
@@ -198,13 +202,13 @@ class Tetrimino {
     }
 
     resetSquare() {
-        console.log("rest ->",this.fills)
+        // console.log("rest ->",this.fills)
          this.fills.forEach(pair => {
            let r =  pair[0]
             let c = pair[1]
-            console.log(pair,r,c)
+            // console.log(pair,r,c)
             let square = squaresMetrix[r][c];
-            console.log(square)
+            // console.log(square)
             square.classList.remove(...square.classList);
             square.classList.add("squares");
             square.style.background = resetSquareOg.style.background
@@ -218,7 +222,7 @@ class Tetrimino {
                 let r = this.looks[this.currentLook][i][0] + this.currentRow;
                 let c = this.looks[this.currentLook][i][1] + this.currentCol;
                 this.fills.push([r,c])
-                console.log("fills",this.fills)
+                // console.log("fills",this.fills)
                 if(!squaresMetrix[r][c].classList.contains("isSet")){
 
                 let square = squaresMetrix[r][c];
@@ -249,7 +253,7 @@ class Tetrimino {
             let  r = this.looks[nextLook][i][0] + this.currentRow
             let c = this.looks[nextLook][i][1] + this.currentCol
             if ((r < 0) || (r > 19) || (c < 0) || (c > 9)) {
-                console.log(`cant rorate ${r},${c} `)
+                // console.log(`cant rorate ${r},${c} `)
                 return false;
             }
         } 
@@ -313,12 +317,12 @@ function setup() {
         console.log("desktop/laptop")
     }
 
-    console.log("body (", document.body.style.width, ",", document.body.style.height, ")");
+    // console.log("body (", document.body.style.width, ",", document.body.style.height, ")");
 
     gameArea.style.width = `${(parseInt(body.style.height) - 32) / (2)}px`;
     gameArea.style.height = `${parseInt(gameArea.style.width) * 2}px`;
     gameArea.style.left = `${(parseInt(body.style.width) / 2) - (parseInt(gameArea.style.width) / 2)}px`;
-    console.log("gameArea: (", gameArea.style.width, ",", gameArea.style.height, ")");
+    // console.log("gameArea: (", gameArea.style.width, ",", gameArea.style.height, ")");
 
     squareH = parseInt(gameArea.style.height) / 20;
     squareW = parseInt(gameArea.style.width) / 10;
@@ -333,7 +337,7 @@ function createSquares() {
             div.style.width = `${squareW - 2.2}px`;
             div.classList.add("squares")
             gameArea.appendChild(div);
-            console.log("(", div.style.width, ",", div.style.height, ")");
+            // console.log("(", div.style.width, ",", div.style.height, ")");
             row.push(div)
         }
         squaresMetrix.push(row)
@@ -349,7 +353,7 @@ function resizeSquares() {
             div.style.width = `${squareW - 2}px`;
             div.classList.add("squares")
             gameArea.appendChild(div);
-            console.log("(", div.style.width, ",", div.style.height, ")");
+            // console.log("(", div.style.width, ",", div.style.height, ")");
         });
     });
 }
@@ -360,12 +364,12 @@ const resetSquareOg = document.createElement("resetSquareOg")
 resetSquareOg.style.height = `${squareH - 2}px`;
 resetSquareOg.style.width = `${squareW - 2}px`;
 resetSquareOg.classList.add("squares")
-console.log(squaresMetrix);
+// console.log(squaresMetrix);
 
 
 function visualizerRotations(tetri, x, y, i) {
     let ran = Math.floor(Math.random() * 4 + 1)
-    console.log("random#", ran)
+    // console.log("random#", ran)
     console.log(tetri[0].length)
     console.log(tetri[ran % 4])
     tetri[i % Object.keys(tetri).length].forEach(pair => {
@@ -384,20 +388,68 @@ function clearSquares() {
 }
 
 
+function find_filled_row(){
+    console.log("****find_filled_row", found, rowFound)
+
+    if(!found){
+        console.log("find_filled_row")
+        while ( rowFound < squaresMetrix.length && !found ) {
+            let count = 0;
+            for (let col = 0; col < squaresMetrix[rowFound].length; col++) {
+                if(squaresMetrix[rowFound][col].classList.contains("tetrimino")){
+                    count+=1;
+                }
+                if(count >= squaresMetrix[rowFound].length )
+                    found = true;
+                    break;
+            }
+            rowFound++;
+        }
+
+        if( found){
+            for (let col = 0; col < squaresMetrix[rowFound].length; col++) {
+                squaresMetrix[rowFound][col].classList.remove(...squaresMetrix[rowFound][col].classList);
+                squaresMetrix[rowFound][col].classList.add("squares");
+                squaresMetrix[rowFound][col].style.background = resetSquareOg.style.background
+            }
+        }
+   }
+}
+
+function fill_row(){
+    console.log("!!!!fill_row", found, rowFound)
+
+    if(found){
+        console.log("fill_row")
+
+        for (; rowFound>0; rowFound--) {
+            for (let col = 0; col < squaresMetrix[rowFound].length; col++) {
+                if(!squaresMetrix[rowFound][col].classList.contains("tetrimino")){
+                    let temp = squaresMetrix[rowFound-1][col].classList
+                    squaresMetrix[rowFound-1][col].classList.remove(...squaresMetrix[rowFound-1][col].classList);
+                    squaresMetrix[rowFound-1][col].classList.add("squares");
+                    squaresMetrix[rowFound-1][col].style.background = resetSquareOg.style.background
+                    squaresMetrix[rowFound][col].classList = temp
+                }
+            }
+        }
+        found = false;
+    }
+}
+
+
+
 function newTetrimino(){
     var tetObj = TETRIMINOS[Math.floor(Math.random() * TETRIMINOS.length)];
     currentTetrimino = new Tetrimino(tetObj);
-    console.log("currentTetrimino  ->", currentTetrimino)
+    // console.log("currentTetrimino  ->", currentTetrimino)
     looks = currentTetrimino.looks;
-    console.log("currentTetrimino.looks  ->", currentTetrimino.looks)
+    // console.log("currentTetrimino.looks  ->", currentTetrimino.looks)
     currentTetrimino.currentCol = 4
     // currentTetrimino.move(); 
 }
 
-newTetrimino()
-
-
-
+newTetrimino();
 
 
 //timmers
@@ -408,6 +460,10 @@ setInterval(()=>{
         newTetrimino()
     }
 }, 600);
+
+setInterval(()=>{find_filled_row}, 500);
+setInterval(()=>{fill_row}, 1000);
+
 
 function getTouches(event) {
     return event.touches ||             // browser API
@@ -447,7 +503,10 @@ function keyUp_touchSwipe(type, event){
             xDown = null;
             yDown = null;  
         }
-    }else{
+    }else if (type == "touchend"){
+        eventKey = " "
+    }
+    else{
         eventKey = event.key;
     }
     switch (eventKey) {
@@ -476,6 +535,8 @@ function keyUp_touchSwipe(type, event){
                 currentTetrimino.resetSquare()
                 currentTetrimino.rotate()
             break;
+
+
     }
 }
 
@@ -495,3 +556,9 @@ document.addEventListener("keyup", (event) => {
 document.addEventListener('touchstart', handleTouchStart, false);        
 document.addEventListener('touchmove',(event)=>{
      keyUp_touchSwipe("touchmove",event)}, false);
+
+document.addEventListener('touchend', (event) => {  
+    keyUp_touchSwipe("touchend",event)}, false);
+});
+
+
