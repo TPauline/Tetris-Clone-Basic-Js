@@ -2,6 +2,12 @@ window.addEventListener("load", () => {
 
 const wrapper = document.getElementById('wrapper');
 const gameArea = document.getElementById('gameArea');
+backgroundMusic = document.querySelector("#backgroundMusic")
+
+backgroundMusic.autoplay = true;
+backgroundMusic.loop = true;
+backgroundMusic.load();
+backgroundMusic.play();
 var xDown = null;                                                        
 var yDown = null;
 var uaData = navigator.userAgentData;
@@ -390,29 +396,31 @@ function clearSquares() {
 
 function find_filled_row(){
     console.log("****find_filled_row", found, rowFound)
-
+    rowFound = squaresMetrix.length-1;
     if(!found){
         console.log("find_filled_row")
-        while ( rowFound < squaresMetrix.length && !found ) {
+        while ( rowFound >=0 && !found ) {
             let count = 0;
             for (let col = 0; col < squaresMetrix[rowFound].length; col++) {
-                if(squaresMetrix[rowFound][col].classList.contains("tetrimino")){
+                if(squaresMetrix[rowFound][col].classList.contains("isSet")){
                     count+=1;
                 }
-                if(count >= squaresMetrix[rowFound].length )
-                    found = true;
-                    break;
+          
             }
-            rowFound++;
+            if(count >= squaresMetrix[rowFound].length ){
+                found = true;
+                break;
+            }
+            rowFound--;
         }
 
-        if( found){
-            for (let col = 0; col < squaresMetrix[rowFound].length; col++) {
-                squaresMetrix[rowFound][col].classList.remove(...squaresMetrix[rowFound][col].classList);
-                squaresMetrix[rowFound][col].classList.add("squares");
-                squaresMetrix[rowFound][col].style.background = resetSquareOg.style.background
-            }
-        }
+        // if( found){
+        //     for (let col = 0; col < squaresMetrix[rowFound].length; col++) {
+        //         squaresMetrix[rowFound][col].classList.remove(...squaresMetrix[rowFound][col].classList);
+        //         squaresMetrix[rowFound][col].classList.add("squares");
+        //         squaresMetrix[rowFound][col].style.background = resetSquareOg.style.background
+        //     }
+        // }
    }
 }
 
@@ -424,13 +432,16 @@ function fill_row(){
 
         for (; rowFound>0; rowFound--) {
             for (let col = 0; col < squaresMetrix[rowFound].length; col++) {
-                if(!squaresMetrix[rowFound][col].classList.contains("tetrimino")){
-                    let temp = squaresMetrix[rowFound-1][col].classList
-                    squaresMetrix[rowFound-1][col].classList.remove(...squaresMetrix[rowFound-1][col].classList);
-                    squaresMetrix[rowFound-1][col].classList.add("squares");
-                    squaresMetrix[rowFound-1][col].style.background = resetSquareOg.style.background
-                    squaresMetrix[rowFound][col].classList = temp
-                }
+                    // let temp = squaresMetrix[rowFound-1][col].classList;
+                    // console.log("temp.  ", temp)
+                    // let tempbg = squaresMetrix[rowFound-1][col].classList.backgroundColor;
+                    squaresMetrix[rowFound][col].classList.remove(...squaresMetrix[rowFound][col].classList);
+                    squaresMetrix[rowFound][col].classList.add("squares");
+                    squaresMetrix[rowFound][col].style.background = squaresMetrix[rowFound-1][col].style.background
+                    squaresMetrix[rowFound][col].classList.add(...squaresMetrix[rowFound-1][col].classList);
+                    squaresMetrix[rowFound][col].style.backgroundColor = squaresMetrix[rowFound-1][col].style.backgroundColor  
+
+                
             }
         }
         found = false;
@@ -461,8 +472,8 @@ setInterval(()=>{
     }
 }, 600);
 
-setInterval(()=>{find_filled_row}, 500);
-setInterval(()=>{fill_row}, 1000);
+setInterval(()=>{find_filled_row()}, 1000);
+setInterval(()=>{fill_row()}, 1000);
 
 
 function getTouches(event) {
@@ -562,3 +573,9 @@ document.addEventListener('touchend', (event) => {
 });
 
 
+// window.addEventListener("DOMContentLoaded", event => {
+//     const audio = document.querySelector("audio");
+//     audio.volume = 0.2;
+//     audio.play();
+//   });
+  
