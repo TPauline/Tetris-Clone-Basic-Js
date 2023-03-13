@@ -325,13 +325,13 @@ function setup() {
 
     // console.log("body (", document.body.style.width, ",", document.body.style.height, ")");
 
-    gameArea.style.width = `${(parseInt(body.style.height)) / (2)}px`;
-    gameArea.style.height = `${(parseInt(gameArea.style.width)-70) * 2}px`;
+    gameArea.style.width = `${(parseInt(body.style.height) - 32) / (2)}px`;
+    gameArea.style.height = `${parseInt(gameArea.style.width) * 2}px`;
     gameArea.style.left = `${(parseInt(body.style.width) / 2) - (parseInt(gameArea.style.width) / 2)}px`;
     // console.log("gameArea: (", gameArea.style.width, ",", gameArea.style.height, ")");
 
-    squareH = (parseInt(gameArea.style.height)) / 20;
-    squareW = (parseInt(gameArea.style.width)) / 10;
+    squareH = parseInt(gameArea.style.height) / 20;
+    squareW = parseInt(gameArea.style.width) / 10;
 }
 
 function createSquares() {

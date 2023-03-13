@@ -22,6 +22,9 @@ body{
     border-width: 0.3em;
 }
 
+#backgroundMusic{
+    position:absolute;
+}
 .squares{
     background:rgba(70, 78, 107, 0.8);
     margin: 0;
