@@ -215,8 +215,8 @@ window.addEventListener("load", () => {
                 // console.log(pair,r,c)
                 let square = squaresMetrix[r][c];
                 // console.log(square)
-                // square.classList.remove(...square.classList);
-                square.className = '';
+                square.classList.remove(...square.classList);
+                // square.className = '';
                 square.classList.add("squares");
                 square.style.background = resetSquareOg.style.background
             });
@@ -396,8 +396,8 @@ window.addEventListener("load", () => {
     
     function clearSquares() {
         document.querySelectorAll(".squares").forEach(t => {
-            // t.classList.remove(...t.classList);
-            t.className = '';
+            t.classList.remove(...t.classList);
+            // t.className = '';
             t.classList.add("squares")
         });
     }
@@ -444,14 +444,14 @@ window.addEventListener("load", () => {
                         // let temp = squaresMetrix[rowFound-1][col].classList;
                         // console.log("temp.  ", temp)
                         // let tempbg = squaresMetrix[rowFound-1][col].classList.backgroundColor;
-                        // squaresMetrix[rowFound][col].classList.remove(...squaresMetrix[rowFound][col].classList);
-                        squaresMetrix[rowFound][col].setAttribute("class", "");
+                        squaresMetrix[rowFound][col].classList.remove(...squaresMetrix[rowFound][col].classList);
+                        // squaresMetrix[rowFound][col].className = '';
                         squaresMetrix[rowFound][col].classList.add("squares");
                         squaresMetrix[rowFound][col].style.background = squaresMetrix[rowFound-1][col].style.background
-                        // squaresMetrix[rowFound][col].classList.add(...squaresMetrix[rowFound-1][col].classList);
-                        squaresMetrix[rowFound-1][col].classList.forEach(cls => {
-                            squaresMetrix[rowFound][col].classList.add(cls);
-                        });
+                        squaresMetrix[rowFound][col].classList.add(...squaresMetrix[rowFound-1][col].classList);
+                        // squaresMetrix[rowFound-1][col].classList.forEach(cls => {
+                        //     squaresMetrix[rowFound][col].classList.add(cls);
+                        // });
                         squaresMetrix[rowFound][col].style.backgroundColor = squaresMetrix[rowFound-1][col].style.backgroundColor  
     
                     
