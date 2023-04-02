@@ -325,12 +325,6 @@ window.addEventListener("load", () => {
         // }
         body.style.width = `${parseInt(window.innerWidth)}px`;
         body.style.height = `${parseInt(window.innerHeight)}px`;
-
-        if (uaData.mobile || !(mobile == 0) || tablet) {
-            body.style.width = `${parseInt(window.screen.width)}px`;
-            body.style.height = `${parseInt(window.screen.height)}px`;
-            console.log("mobile/tablet")
-        } 
         // console.log("body (", document.body.style.width, ",", document.body.style.height, ")");
     
         gameArea.style.width = `${(parseInt(body.style.height) - 32) / (2)}px`;
